@@ -3,10 +3,10 @@ from datetime import datetime, timedelta
 
 #------------------------------------select and import file that we use------------------------------------------
 
-data_file = "/Users/marjoleinvantol/Desktop/CDTF/trails.csv"
+data_file = "trails.csv"
 trail_data = pd.read_csv(data_file, low_memory=False)
 
-steps_file = "/Users/marjoleinvantol/Desktop/CDTF/26-02(Yasmin)/steps_data_yasmin(26-02).csv"
+steps_file = "26-02(marjolein)/steps_data_marjolein(26-02).csv"
 steps_data = pd.read_csv(steps_file, low_memory=False)
 
 
