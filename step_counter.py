@@ -3,12 +3,13 @@ from datetime import datetime, timedelta
 
 #------------------------------------select and import file that we use------------------------------------------
 
-data_file = "trails.csv"
+data_file = "trails(2).csv"
 trail_data = pd.read_csv(data_file, low_memory=False)
 
-steps_file = "26-02(marjolein)/steps_data_marjolein(26-02).csv"
+steps_file = "/Users/marjoleinvantol/Desktop/CDTF_project/27-02(Yasmin)/steps_data_yasmin(27-02).csv"
 steps_data = pd.read_csv(steps_file, low_memory=False)
 
+date = "27-02-2026"
 
 #---------------------------------------------convert data---------------------------------------------------------
 
@@ -25,18 +26,19 @@ filtered = trail_data[
         trail_data['end_time_descend'].notna()
     ]
 
+filtered_df = filtered[filtered["date"] == "27-02-2026"]
+
 # make a list of all the start and end times so we can loop over the trails
 times = list(zip(
-        filtered['start_time_ascend'],
-        filtered['end_time_ascend'],
-        filtered['start_time_descend'],
-        filtered['end_time_descend']
+        filtered_df['start_time_ascend'],
+        filtered_df['end_time_ascend'],
+        filtered_df['start_time_descend'],
+        filtered_df['end_time_descend']
     ))
-
 
 #---------------------------------------------Functions-----------------------------------------------------------
 
-def count_steps_in_window(steps_data, start_time_str, end_time_str, buffer_seconds=2):
+def count_steps_in_window(steps_data, start_time_str, end_time_str, buffer_seconds=5):
     total_steps = 0
     today = datetime.today().date()
 
@@ -78,7 +80,7 @@ for trail in times:
     count_steps.append((total_steps_descend, "descend", trail[2], trail[3]))
     
 # show_ascend(count_steps)   
-show_descend(count_steps)         
+show_ascend(count_steps)         
 
 
 

@@ -5,8 +5,8 @@ import numpy as np
 
 
 #--------------------------------Select Values----------------------------------------
-start_date = "2026-02-26"
-end_data = "2026-02-27"
+start_date = "2026-02-27"
+end_data = "2026-02-28"
 type_name = "HKQuantityTypeIdentifierWalkingSpeed"
 
 # "HKQuantityTypeIdentifierStepCount"
@@ -22,7 +22,7 @@ type_name = "HKQuantityTypeIdentifierWalkingSpeed"
 needed_information = ["value","unit", "type", "sourceName", "startDate", "endDate", "device"]
 type_names = ["HKQuantityTypeIdentifierStepCount", "HKQuantityTypeIdentifierDistanceWalkingRunning", "HKQuantityTypeIdentifierFlightsClimbed", "HKQuantityTypeIdentifierWalkingSpeed", "HKQuantityTypeIdentifierWalkingStepLength", "HKQuantityTypeIdentifierWalkingAsymmetryPercentage", "HKQuantityTypeIdentifierWalkingDoubleSupportPercentage"]
 
-data_file = "/Users/marjoleinvantol/Desktop/CDTF/yasmin.csv"
+data_file = "/Users/marjoleinvantol/Desktop/CDTF_project/yasmin.csv"
 trail_data = pd.read_csv(data_file, low_memory=False)
 
 # filter the data on the date you selected 
@@ -34,7 +34,7 @@ date_filtered = trail_data[
 selected_data = date_filtered[date_filtered["type"] == type_name]
 print(selected_data[needed_information])
 
-selected_data[needed_information].to_csv('walkingspeed_yasmin(26-02).csv', index=False)
+selected_data[needed_information].to_csv('walkingspeed_data_yasmin(27-02).csv', index=False)
 
 
 # # plot info taken on a day 
