@@ -3,13 +3,13 @@ from datetime import datetime, timedelta
 
 #------------------------------------select and import file that we use------------------------------------------
 
-data_file = "trails(2).csv"
+data_file = "trails(3).csv"
 trail_data = pd.read_csv(data_file, low_memory=False)
 
-steps_file = "/Users/marjoleinvantol/Desktop/CDTF_project/27-02(Yasmin)/steps_data_yasmin(27-02).csv"
+steps_file = "/Users/marjoleinvantol/Desktop/CDTF_project/06-03(Yasmin)/steps_data_yasmin(06-03).csv"
 steps_data = pd.read_csv(steps_file, low_memory=False)
 
-date = "27-02-2026"
+date = "06-03-2026"
 
 #---------------------------------------------convert data---------------------------------------------------------
 
@@ -26,7 +26,7 @@ filtered = trail_data[
         trail_data['end_time_descend'].notna()
     ]
 
-filtered_df = filtered[filtered["date"] == "27-02-2026"]
+filtered_df = filtered[filtered["date"] == date]
 
 # make a list of all the start and end times so we can loop over the trails
 times = list(zip(
@@ -80,7 +80,7 @@ for trail in times:
     count_steps.append((total_steps_descend, "descend", trail[2], trail[3]))
     
 # show_ascend(count_steps)   
-show_ascend(count_steps)         
+show_descend(count_steps)         
 
 
 

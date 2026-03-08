@@ -5,8 +5,8 @@ import numpy as np
 
 
 #--------------------------------Select Values----------------------------------------
-start_date = "2026-02-27"
-end_data = "2026-02-28"
+start_date = "2026-03-06"
+end_data = "2026-03-07"
 type_name = "HKQuantityTypeIdentifierWalkingSpeed"
 
 # "HKQuantityTypeIdentifierStepCount"
@@ -34,7 +34,7 @@ date_filtered = trail_data[
 selected_data = date_filtered[date_filtered["type"] == type_name]
 print(selected_data[needed_information])
 
-selected_data[needed_information].to_csv('walkingspeed_data_yasmin(27-02).csv', index=False)
+selected_data[needed_information].to_csv('walkingspeed_data_yasmin(06-03).csv', index=False)
 
 
 # # plot info taken on a day 
