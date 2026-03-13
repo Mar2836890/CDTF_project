@@ -117,9 +117,9 @@ for device in ["iphone13m", "iphoneSE"]:
         s=100
     )
 
-    plt.title(f"{device} - Step Accuracy vs average Speed")
+    plt.title(f"{device} - Step Accuracy vs Average Speed")
     plt.xlabel("Average Speed (m/s)")
     plt.ylabel("Accuracy (%)")
     plt.ylim([25, 105])
     plt.legend(title="Direction / Condition")
-    # plt.show()
+    plt.show()
