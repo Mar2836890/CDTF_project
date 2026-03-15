@@ -23,28 +23,69 @@ def accuracy_evaluation(rows):
     accuracy = accuracy_score(ground_truth, registered)
     return accuracy
 
-grouped_phone_condition_person = df.groupby(["phone", "condition", "person"])
+
+# Group by phone, condition, person, and floors
+grouped_phone_condition_person = df.groupby(["phone", "condition", "person", "floors"])
 
 def total_accuracy_per_person(data):
     global acc_df
     for (group_selection, rows) in grouped_phone_condition_person:
         accuracy = accuracy_evaluation(rows)
+
         phone = group_selection[0]
         condition = group_selection[1]
         person = group_selection[2]
-        ascend_row = pd.DataFrame({'phone': [phone], 'condition': [condition], 'direction': ["ascending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
-        acc_df = pd.concat([acc_df, ascend_row], ignore_index=True) 
-        print(f"Accuracy for {condition} by {person} with ({phone}): {accuracy}")
+        floors = group_selection[3]
 
-grouped_phone_condition = df.groupby(["phone", "condition"])
+        ascend_row = pd.DataFrame({'phone': [phone], 'condition': [condition], 'direction': ["ascending"], 'person': [person], 'floors': [floors], 'accuracy': [accuracy], 'avg_speed': [0]})
+        acc_df = pd.concat([acc_df, ascend_row], ignore_index=True)
+
+        print(f"Accuracy for {condition}, {floors} floor(s) by {person} with ({phone}): {accuracy}")
+
+total_accuracy_per_person(all_data)
+
+# Group by phone, condition, and floors
+grouped_phone_condition = df.groupby(["phone", "condition", "floors"])
 
 def total_accuracy_per_condition(data):
     for (group_selection, rows) in grouped_phone_condition:
         accuracy = accuracy_evaluation(rows)
+
         phone = group_selection[0]
         condition = group_selection[1]
+        floors = group_selection[2]
 
-        print(f"Accuracy for {condition} with ({phone}): {accuracy}")
+        print(f"Accuracy for {condition}, {floors} floor(s) with ({phone}): {accuracy}")
+        
+# total_accuracy_per_condition(all_data)
+# def accuracy_evaluation(rows):
+#     ground_truth = rows["floors"]
+#     registered = rows["registered_floors_ascend"]
+#     accuracy = accuracy_score(ground_truth, registered)
+#     return accuracy
+
+# grouped_phone_condition_person = df.groupby(["phone", "condition", "person"])
+
+# def total_accuracy_per_person(data):
+#     global acc_df
+#     for (group_selection, rows) in grouped_phone_condition_person:
+#         accuracy = accuracy_evaluation(rows)
+#         phone = group_selection[0]
+#         condition = group_selection[1]
+#         person = group_selection[2]
+#         ascend_row = pd.DataFrame({'phone': [phone], 'condition': [condition], 'direction': ["ascending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
+#         acc_df = pd.concat([acc_df, ascend_row], ignore_index=True) 
+#         print(f"Accuracy for {condition} by {person} with ({phone}): {accuracy}")
+
+# grouped_phone_condition = df.groupby(["phone", "condition"])
+
+# def total_accuracy_per_condition(data):
+#     for (group_selection, rows) in grouped_phone_condition:
+#         accuracy = accuracy_evaluation(rows)
+#         phone = group_selection[0]
+#         condition = group_selection[1]
+
+#         print(f"Accuracy for {condition} with ({phone}): {accuracy}")
 
 
 # ----------------------------------------  Get accuracy steps  -----------------------------------------------------------------------------------
@@ -133,6 +174,7 @@ def get_average_speed():
     )
 
     acc_df = acc_df.drop(columns=["v_ascend", "v_descend"])
+    print(acc_df)
 
 
 # ----------------------------------------  Make plots ---------------------------------------------------------------
@@ -143,15 +185,12 @@ def plot_acc_velocity(plot):
         iphone_se_df = acc_df[acc_df["phone"] == device]
 
         sns.set(style="whitegrid")
-
-        sns.scatterplot(
-            data=iphone_se_df,
-            x="avg_speed",
-            y="accuracy",
-            hue="direction",       # ascending vs descending
-            style="condition",     # slow/walking/running
-            s=100
-        )
+        if plot == "Step":
+            sns.scatterplot(data=iphone_se_df, x="avg_speed", y="accuracy", hue="direction", style="condition", s=100,
+                            palette={"ascending": "#1f77b4", "descending": "#ff7f0e"})
+        else:
+            sns.scatterplot(data=iphone_se_df, x="avg_speed", y="accuracy", hue="floors", style="condition", s=100,
+                            palette={1: "#1f77b4", 2: "#ff7f0e"})
 
         plt.title(f"{device} - {plot} Accuracy vs Average Speed")
         plt.xlabel("Average Speed (m/s)")
@@ -164,12 +203,12 @@ def plot_acc_velocity(plot):
 
 # ----------------------------------------  Choose which accuracy you want to calculate ---------------------------------------
 
-plot = ("step")
-steps_acc()
+# plot = ("Step")
+# steps_acc()
 
-# plot = ("floor")
+# plot = ("Floor")
 # total_accuracy_per_person(df)
 
 
-get_average_speed()
-plot_acc_velocity(plot)
+# get_average_speed()
+# plot_acc_velocity(plot)
