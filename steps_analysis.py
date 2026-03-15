@@ -2,124 +2,174 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 
-# Get accuracy  -----------------------------------------------------------------------------------
+# ----------------------------------------  Load in dataset  -------------------------------------------------------------------------
 
 data_file = "Data - cybercrime_data.csv"
-
 all_data = pd.read_csv(data_file, low_memory=False)
 
+# create empty data frame to store accuracies
 acc_df = pd.DataFrame()
 
-all_data_iphone13 = all_data[all_data["phone"] == "iphone13m"]
-all_data_iphoneSE = all_data[all_data["phone"] == "iphoneSE"]
 
-for phone in ["iphone13m", "iphoneSE"]:
-    for speed in ["slow", "walking","running"]:
-        if phone == "iphone13m":
-            trails_with_this_speed = all_data_iphone13[all_data_iphone13["condition"] == speed]
-        else:
-            trails_with_this_speed = all_data_iphoneSE[all_data_iphoneSE["condition"] == speed]
+# ---------------------------------------- Get accuracy floors (by napoleon and yasmin) ----------------------------------------------
 
-        trails_with_this_speed['Error_ascend'] = abs(trails_with_this_speed['step_count_ascend'] - trails_with_this_speed['registered_steps_ascend'])
-        trails_with_this_speed['Error_descend'] = abs(trails_with_this_speed['step_count_descend'] - trails_with_this_speed['registered_steps_descend'])
+df = all_data
 
-        trails_with_this_speed['Accuracy_ascend'] = (1 - (trails_with_this_speed['Error_ascend'] / trails_with_this_speed['step_count_ascend'])) * 100
-        trails_with_this_speed['Accuracy_descend'] = (1 - (trails_with_this_speed['Error_ascend'] / trails_with_this_speed['step_count_descend'])) * 100
+def accuracy_evaluation(rows):
+    ground_truth = rows["floors"]
+    registered = rows["registered_floors_ascend"]
+    accuracy = accuracy_score(ground_truth, registered)
+    return accuracy
 
+grouped_phone_condition_person = df.groupby(["phone", "condition", "person"])
 
-        step_accuracy_ascend = trails_with_this_speed['Accuracy_ascend'].mean()
-        step_accuracy_descend = trails_with_this_speed['Accuracy_descend'].mean()
-        
-        # print(phone, speed, "ascend acc:",step_accuracy_ascend, "descend acc:", step_accuracy_descend, "\n")
+def total_accuracy_per_person(data):
+    global acc_df
+    for (group_selection, rows) in grouped_phone_condition_person:
+        accuracy = accuracy_evaluation(rows)
+        phone = group_selection[0]
+        condition = group_selection[1]
+        person = group_selection[2]
+        ascend_row = pd.DataFrame({'phone': [phone], 'condition': [condition], 'direction': ["ascending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
+        acc_df = pd.concat([acc_df, ascend_row], ignore_index=True) 
+        print(f"Accuracy for {condition} by {person} with ({phone}): {accuracy}")
 
-        user_accuracy_ascend = trails_with_this_speed.groupby('person')['Accuracy_ascend'].mean()
-        user_accuracy_descend = trails_with_this_speed.groupby('person')['Accuracy_descend'].mean()
-        
-        # print(phone, speed,"ascend", user_accuracy_ascend,"\n")
-        # print(phone, speed, "descend",user_accuracy_descend,"\n")
-        
-        for person, accuracy in user_accuracy_ascend.items():
-            ascend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["ascending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
-            acc_df = pd.concat([acc_df, ascend_row], ignore_index=True) 
+grouped_phone_condition = df.groupby(["phone", "condition"])
 
-        for person, accuracy in user_accuracy_descend.items():
-            descend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["descending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
-            acc_df = pd.concat([acc_df, descend_row], ignore_index=True) 
+def total_accuracy_per_condition(data):
+    for (group_selection, rows) in grouped_phone_condition:
+        accuracy = accuracy_evaluation(rows)
+        phone = group_selection[0]
+        condition = group_selection[1]
 
-# Get average speeds ---------------------------------------------------------------
+        print(f"Accuracy for {condition} with ({phone}): {accuracy}")
 
 
-all_data["v_ascend (m/s)"] = (
-    all_data["v_ascend (m/s)"]
-    .astype(str)
-    .str.replace(",", ".")
-    .astype(float)
-)
-all_data["v_descend (m/s)"] = (
-    all_data["v_descend (m/s)"]
-    .astype(str)
-    .str.replace(",", ".")
-    .astype(float)
-)
+# ----------------------------------------  Get accuracy steps  -----------------------------------------------------------------------------------
 
-velocity_avg = (
-    all_data.groupby(["phone", "person", "condition"])
-    .agg({
-        "v_ascend (m/s)": "mean",
-        "v_descend (m/s)": "mean"
-    })
-    .reset_index()
-)
+def steps_acc():
+    global acc_df
+    all_data_iphone13 = all_data[all_data["phone"] == "iphone13m"]
+    all_data_iphoneSE = all_data[all_data["phone"] == "iphoneSE"]
 
-velocity_avg = velocity_avg.rename(
-    columns={"v_ascend (m/s)": "v_ascend", "v_descend (m/s)": "v_descend"}
-)
+    for phone in ["iphone13m", "iphoneSE"]:
+        for speed in ["slow", "walking","running"]:
+            if phone == "iphone13m":
+                trails_with_this_speed = all_data_iphone13[all_data_iphone13["condition"] == speed]
+            else:
+                trails_with_this_speed = all_data_iphoneSE[all_data_iphoneSE["condition"] == speed]
 
-# print(velocity_avg)
+            # calculate accuracies for ascend and descend for each row 
+            trails_with_this_speed['Error_ascend'] = abs(trails_with_this_speed['step_count_ascend'] - trails_with_this_speed['registered_steps_ascend'])
+            trails_with_this_speed['Error_descend'] = abs(trails_with_this_speed['step_count_descend'] - trails_with_this_speed['registered_steps_descend'])
 
-# add velocities to accuracies 
-acc_df = acc_df.merge(
-    velocity_avg,
-    on=["phone", "person", "condition"],  # include phone!
-    how="left"
-)
+            trails_with_this_speed['Accuracy_ascend'] = (1 - (trails_with_this_speed['Error_ascend'] / trails_with_this_speed['step_count_ascend'])) * 100
+            trails_with_this_speed['Accuracy_descend'] = (1 - (trails_with_this_speed['Error_ascend'] / trails_with_this_speed['step_count_descend'])) * 100
 
-acc_df["avg_speed"] = acc_df.apply(
-    lambda row: row["v_ascend"] if row["direction"] == "ascending" else row["v_descend"],
-    axis=1
-)
+            # calculate the total accuracy for the different walking conditions
+            step_accuracy_ascend = trails_with_this_speed['Accuracy_ascend'].mean()
+            step_accuracy_descend = trails_with_this_speed['Accuracy_descend'].mean()
+            print(phone, speed, "ascend acc:",step_accuracy_ascend, "descend acc:", step_accuracy_descend, "\n")
 
-acc_df = acc_df.drop(columns=["v_ascend", "v_descend"])
+            # calculate the total accuracy for the different walking conditions per person 
+            user_accuracy_ascend = trails_with_this_speed.groupby('person')['Accuracy_ascend'].mean()
+            user_accuracy_descend = trails_with_this_speed.groupby('person')['Accuracy_descend'].mean()
+            # print(phone, speed,"ascend", user_accuracy_ascend,"\n")
+            # print(phone, speed, "descend",user_accuracy_descend,"\n")
 
+            # add the accuracies to the data frame to use later 
+            for person, accuracy in user_accuracy_ascend.items():
+                ascend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["ascending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
+                acc_df = pd.concat([acc_df, ascend_row], ignore_index=True) 
 
-# print(acc_df)
+            for person, accuracy in user_accuracy_descend.items():
+                descend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["descending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
+                acc_df = pd.concat([acc_df, descend_row], ignore_index=True) 
 
 
-# Make plots ---------------------------------------------------------------
+# ----------------------------------------  Get average speeds ---------------------------------------------------------------
 
-
-for device in ["iphone13m", "iphoneSE"]:
-    iphone_se_df = acc_df[acc_df["phone"] == device]
-    
-    ascend_df = iphone_se_df[iphone_se_df["direction"] == "ascending"]
-    descend_df = iphone_se_df[iphone_se_df["direction"] == "descending"]
-
-
-    sns.set(style="whitegrid")
-
-    sns.scatterplot(
-        data=iphone_se_df,
-        x="avg_speed",
-        y="accuracy",
-        hue="direction",       # ascending vs descending
-        style="condition",     # slow/walking/running
-        s=100
+def get_average_speed():
+    global acc_df
+    all_data["v_ascend (m/s)"] = (
+        all_data["v_ascend (m/s)"]
+        .astype(str)
+        .str.replace(",", ".")
+        .astype(float)
+    )
+    all_data["v_descend (m/s)"] = (
+        all_data["v_descend (m/s)"]
+        .astype(str)
+        .str.replace(",", ".")
+        .astype(float)
     )
 
-    plt.title(f"{device} - Step Accuracy vs Average Speed")
-    plt.xlabel("Average Speed (m/s)")
-    plt.ylabel("Accuracy (%)")
-    plt.ylim([25, 105])
-    plt.legend(title="Direction / Condition")
-    plt.show()
+    # calculate the average velocity of each participant for each walking condition 
+    velocity_avg = (
+        all_data.groupby(["phone", "person", "condition"])
+        .agg({
+            "v_ascend (m/s)": "mean",
+            "v_descend (m/s)": "mean"
+        })
+        .reset_index()
+    )
+
+    velocity_avg = velocity_avg.rename(
+        columns={"v_ascend (m/s)": "v_ascend", "v_descend (m/s)": "v_descend"}
+    )
+
+    # add velocities to accuracies in the dataframe
+    acc_df = acc_df.merge(
+        velocity_avg,
+        on=["phone", "person", "condition"], 
+        how="left"
+    )
+
+    acc_df["avg_speed"] = acc_df.apply(
+        lambda row: row["v_ascend"] if row["direction"] == "ascending" else row["v_descend"],
+        axis=1
+    )
+
+    acc_df = acc_df.drop(columns=["v_ascend", "v_descend"])
+
+
+# ----------------------------------------  Make plots ---------------------------------------------------------------
+
+def plot_acc_velocity(plot):
+    global acc_df
+    for device in ["iphone13m", "iphoneSE"]:
+        iphone_se_df = acc_df[acc_df["phone"] == device]
+
+        sns.set(style="whitegrid")
+
+        sns.scatterplot(
+            data=iphone_se_df,
+            x="avg_speed",
+            y="accuracy",
+            hue="direction",       # ascending vs descending
+            style="condition",     # slow/walking/running
+            s=100
+        )
+
+        plt.title(f"{device} - {plot} Accuracy vs Average Speed")
+        plt.xlabel("Average Speed (m/s)")
+        plt.ylabel("Accuracy (%)")
+        if plot == "Step":
+            plt.ylim([25, 105])
+        plt.legend(title="Direction / Condition")
+        plt.show()
+
+
+# ----------------------------------------  Choose which accuracy you want to calculate ---------------------------------------
+
+plot = ("step")
+steps_acc()
+
+# plot = ("floor")
+# total_accuracy_per_person(df)
+
+
+get_average_speed()
+plot_acc_velocity(plot)
