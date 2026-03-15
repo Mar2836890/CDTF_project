@@ -37,7 +37,8 @@ def total_accuracy_per_person(data):
         person = group_selection[2]
         floors = group_selection[3]
 
-        ascend_row = pd.DataFrame({'phone': [phone], 'condition': [condition], 'direction': ["ascending"], 'person': [person], 'floors': [floors], 'accuracy': [accuracy], 'avg_speed': [0]})
+        ascend_row = pd.DataFrame({'phone': [phone], 'condition': [condition], 'direction': ["ascending"], 'person': [person], 
+                                'floors': [floors], 'accuracy': [accuracy], 'avg_speed': [0]})
         acc_df = pd.concat([acc_df, ascend_row], ignore_index=True)
 
         print(f"Accuracy for {condition}, {floors} floor(s) by {person} with ({phone}): {accuracy}")
@@ -122,11 +123,13 @@ def steps_acc():
 
             # add the accuracies to the data frame to use later 
             for person, accuracy in user_accuracy_ascend.items():
-                ascend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["ascending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
+                ascend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["ascending"], 
+                                        "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
                 acc_df = pd.concat([acc_df, ascend_row], ignore_index=True) 
 
             for person, accuracy in user_accuracy_descend.items():
-                descend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["descending"], "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
+                descend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["descending"], 
+                                        "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
                 acc_df = pd.concat([acc_df, descend_row], ignore_index=True) 
 
 

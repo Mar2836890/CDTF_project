@@ -78,7 +78,7 @@ for trail in times:
 
     count_steps.append((total_steps_ascend, "ascend", trail[0], trail[1]))
     count_steps.append((total_steps_descend, "descend", trail[2], trail[3]))
-    
+
 # show_ascend(count_steps)   
 show_ascend(count_steps)         
 
