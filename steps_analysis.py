@@ -200,18 +200,18 @@ def plot_acc_velocity(plot):
         plt.ylabel("Accuracy (%)")
         if plot == "Step":
             plt.ylim([25, 105])
-        plt.legend(title="Direction / Condition")
+        plt.legend(title="Direction / Condition", loc=(1.04, 0))
+        plt.savefig(f"{device} - {plot} Accuracy vs Average Speed", dpi=200, bbox_inches='tight', pad_inches=0.1 )
         plt.show()
-
 
 # ----------------------------------------  Choose which accuracy you want to calculate ---------------------------------------
 
-# plot = ("Step")
-# steps_acc()
+plot = ("Step")
+steps_acc()
 
 # plot = ("Floor")
 # total_accuracy_per_person(df)
 
 
-# get_average_speed()
-# plot_acc_velocity(plot)
+get_average_speed()
+plot_acc_velocity(plot)
