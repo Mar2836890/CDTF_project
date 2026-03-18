@@ -1,8 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.patches as mpatches
 
 # ----------------------------------------  Load in dataset  -------------------------------------------------------------------------
 
@@ -31,7 +33,7 @@ def total_accuracy_per_person(data):
     global acc_df
     for (group_selection, rows) in grouped_phone_condition_person:
         accuracy = accuracy_evaluation(rows)
-
+        accuracy = accuracy * 100
         phone = group_selection[0]
         condition = group_selection[1]
         person = group_selection[2]
@@ -43,7 +45,7 @@ def total_accuracy_per_person(data):
 
         print(f"Accuracy for {condition}, {floors} floor(s) by {person} with ({phone}): {accuracy}")
 
-total_accuracy_per_person(all_data)
+# total_accuracy_per_person(all_data)
 
 # Group by phone, condition, and floors
 grouped_phone_condition = df.groupby(["phone", "condition", "floors"])
@@ -182,35 +184,95 @@ def get_average_speed():
 
 # ----------------------------------------  Make plots ---------------------------------------------------------------
 
-def plot_acc_velocity(plot):
-    global acc_df
+def plot_acc_velocity(plot):    
+
     for device in ["iphone13m", "iphoneSE"]:
         iphone_se_df = acc_df[acc_df["phone"] == device]
-
+        
         sns.set(style="whitegrid")
-        if plot == "Step":
-            sns.scatterplot(data=iphone_se_df, x="avg_speed", y="accuracy", hue="direction", style="condition", s=100,
-                            palette={"ascending": "#1f77b4", "descending": "#ff7f0e"})
-        else:
-            sns.scatterplot(data=iphone_se_df, x="avg_speed", y="accuracy", hue="floors", style="condition", s=100,
-                            palette={1: "#1f77b4", 2: "#ff7f0e"})
+        fig, ax = plt.subplots()
 
-        plt.title(f"{device} - {plot} Accuracy vs Average Speed")
-        plt.xlabel("Average Speed (m/s)")
-        plt.ylabel("Accuracy (%)")
+        # --- Background regions ---
+        slow_color = "#012a4a"
+        walking_color = "#2c7da0"
+        fast_color = "#a9d6e5"
+
+        ax.axvspan(0, 0.6, color=slow_color, alpha=0.35)
+        ax.axvspan(0.6, 1, color=walking_color, alpha=0.35)
+        ax.axvspan(1, 2.0, color=fast_color, alpha=0.35)
+
+        # --- Scatter plot ---
         if plot == "Step":
-            plt.ylim([25, 105])
-        plt.legend(title="Direction / Condition", loc=(1.04, 0))
-        plt.savefig(f"{device} - {plot} Accuracy vs Average Speed", dpi=200, bbox_inches='tight', pad_inches=0.1 )
+            scatter = sns.scatterplot(
+                data=iphone_se_df,
+                x="avg_speed",
+                y="accuracy",
+                hue="direction",
+                s=100,
+                palette={"ascending": "#1f77b4", "descending": "#ff7f0e"},
+                ax=ax
+            )
+        else:
+            scatter = sns.scatterplot(
+                data=iphone_se_df,
+                x="avg_speed",
+                y="accuracy",
+                hue="floors",
+                s=100,
+                palette={1: "#1f77b4", 2: "#ff7f0e"},
+                ax=ax
+            )
+
+        # --- Create background legend handles ---
+        slow_patch = mpatches.Patch(color=slow_color, alpha=0.3, label="Slow")
+        walking_patch = mpatches.Patch(color=walking_color, alpha=0.3, label="Walking")
+        fast_patch = mpatches.Patch(color=fast_color, alpha=0.3, label="Fast")
+
+        # --- Combine legends ---
+        handles, labels = ax.get_legend_handles_labels()
+        handles.extend([slow_patch, walking_patch, fast_patch])
+
+        floor_labels = ["1 floor" if l == "1" else "2 floors" if l == "2" else l for l in labels]
+        
+        ax.legend(
+            handles=handles,
+            labels=floor_labels + ["Slow", "Walking", "Fast"],
+            loc=(1.04, 0),
+            title="Legend"
+        )
+
+        # --- Labels & formatting ---
+        ax.set_title(f"{device} - Accuracy of {plot} registration for different velocities")
+        ax.set_xlabel("Average Velocity (m/s)")
+        ax.set_ylabel("Accuracy (%)")
+        
+        ax.set_xticks(np.arange(0, 2.1, 0.25))   # 0 → 2 in steps of 0.25
+        ax.set_yticks(np.arange(0, 105 + 1, 10))
+
+        if plot == "Step":
+            ax.set_ylim([25, 105])
+        else:
+            ax.set_ylim([-5, 105])
+
+        ax.set_xlim([0, 2])
+        ax.grid(True, alpha=0.2)
+
+        plt.savefig(
+            f"{device} - {plot} Accuracy vs Average Speed",
+            dpi=200,
+            bbox_inches='tight',
+            pad_inches=0.1
+        )
         plt.show()
 
 # ----------------------------------------  Choose which accuracy you want to calculate ---------------------------------------
 
-plot = ("Step")
-steps_acc()
 
-# plot = ("Floor")
-# total_accuracy_per_person(df)
+# plot = ("Step")
+# steps_acc()
+
+plot = ("Floor")
+total_accuracy_per_person(df)
 
 
 get_average_speed()
