@@ -165,6 +165,7 @@ def get_average_speed():
     velocity_avg = velocity_avg.rename(
         columns={"v_ascend (m/s)": "v_ascend", "v_descend (m/s)": "v_descend"}
     )
+    print(velocity_avg)
 
     # add velocities to accuracies in the dataframe
     acc_df = acc_df.merge(
@@ -179,7 +180,9 @@ def get_average_speed():
     )
 
     acc_df = acc_df.drop(columns=["v_ascend", "v_descend"])
-    print(acc_df)
+    # print(acc_df)
+    # print(acc_df.groupby(["phone", "person", "condition"])["avg_speed"].mean().reset_index())
+ 
 
 
 # ----------------------------------------  Make plots ---------------------------------------------------------------
@@ -188,7 +191,10 @@ def plot_acc_velocity(plot):
 
     for device in ["iphone13m", "iphoneSE"]:
         iphone_se_df = acc_df[acc_df["phone"] == device]
-        
+        if device == "iphone13m":
+            device = "iPhone 13 mini"
+        else:
+            device = "iPhone SE"
         sns.set(style="whitegrid")
         fig, ax = plt.subplots()
 
@@ -242,7 +248,7 @@ def plot_acc_velocity(plot):
         )
 
         # --- Labels & formatting ---
-        ax.set_title(f"{device} - Accuracy of {plot} registration for different velocities")
+        ax.set_title(f"Accuracy of {plot} registration for different velocities ({device})", fontweight='bold')
         ax.set_xlabel("Average Velocity (m/s)")
         ax.set_ylabel("Accuracy (%)")
         
