@@ -6,6 +6,8 @@ import numpy as np
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, mean_absolute_error
 import matplotlib.patches as mpatches
 
+# made by Marjolein (except for accuracy floors)
+
 # ----------------------------------------  Load in dataset  -------------------------------------------------------------------------
 
 data_file = "Data - cybercrime_data.csv"
@@ -128,7 +130,6 @@ def steps_acc():
                 ascend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["ascending"], 
                                         "person": [person], "accuracy":[accuracy], "avg_speed":[0]})
                 acc_df = pd.concat([acc_df, ascend_row], ignore_index=True) 
-                person_trials = trails_with_this_speed[trails_with_this_speed['person'] == person]
                 # print(phone, person, speed, mae)
             for person, accuracy in user_accuracy_descend.items():
                 descend_row = pd.DataFrame({'phone': [phone], 'condition': [speed], 'direction': ["descending"], 
@@ -219,10 +220,8 @@ def plot_acc_velocity(plot):
         plt.savefig(
             f"{device} - {plot} Accuracy vs Average Speed", dpi=200, bbox_inches='tight', pad_inches=0.1)
         plt.show()
-        
 
 # ----------------------------------------  Choose which accuracy you want to calculate ---------------------------------------
-
 
 # plot = ("Step")
 # steps_acc()
@@ -233,5 +232,3 @@ total_accuracy_per_person(df)
 
 # get_average_speed()
 # plot_acc_velocity(plot)
-
-# plot_correlation()

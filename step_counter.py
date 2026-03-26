@@ -1,6 +1,8 @@
 import pandas as pd
 from datetime import datetime, timedelta
 
+# made by Marjolein
+
 #------------------------------------select and import file that we use------------------------------------------
 
 data_file = "trails(3).csv"
