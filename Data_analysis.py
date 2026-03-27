@@ -168,6 +168,7 @@ def plot_acc_velocity(plot):
         else:
             device = "iPhone SE"
         sns.set(style="whitegrid")
+        
         fig, ax = plt.subplots()
 
         # background regions 
@@ -221,7 +222,7 @@ def plot_acc_velocity(plot):
             f"{device} - {plot} Accuracy vs Average Speed", dpi=200, bbox_inches='tight', pad_inches=0.1)
         plt.show()
 
-# ----------------------------------------  Choose which accuracy you want to calculate ---------------------------------------
+# ----------------------------------------  Choose which part you want to calculate ---------------------------------------
 
 # plot = ("Step")
 # steps_acc()

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 data_file = "trails(3).csv"
 trail_data = pd.read_csv(data_file, low_memory=False)
 
-steps_file = "/Users/marjoleinvantol/Desktop/CDTF_project/06-03(Yasmin)/steps_data_yasmin(06-03).csv"
+steps_file = "CDTF_project/06-03(Yasmin)/steps_data_yasmin(06-03).csv"
 steps_data = pd.read_csv(steps_file, low_memory=False)
 
 date = "06-03-2026"

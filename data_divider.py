@@ -23,7 +23,7 @@ type_name = "HKQuantityTypeIdentifierWalkingSpeed"
 needed_information = ["value","unit", "type", "sourceName", "startDate", "endDate", "device"]
 type_names = ["HKQuantityTypeIdentifierStepCount", "HKQuantityTypeIdentifierDistanceWalkingRunning", "HKQuantityTypeIdentifierFlightsClimbed", "HKQuantityTypeIdentifierWalkingSpeed", "HKQuantityTypeIdentifierWalkingStepLength", "HKQuantityTypeIdentifierWalkingAsymmetryPercentage", "HKQuantityTypeIdentifierWalkingDoubleSupportPercentage"]
 
-data_file = "/Users/marjoleinvantol/Desktop/CDTF_project/yasmin.csv"
+data_file = "CDTF_project/yasmin.csv"
 trail_data = pd.read_csv(data_file, low_memory=False)
 
 # filter the data on the date you selected 
