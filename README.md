@@ -17,7 +17,7 @@ Participants completed stair-climbing trials under multiple controlled condition
 The results indicate that walking speed significantly affects the accuracy of both step and floor registration. Normal walking showed the highest precision, while running resulted in underregistration and slow-walking led to step overregistration. These findings highlight both the potential forensic value and the limitations of using smartphone activity data in investigations.
 
 
-### trial_data.csv
+### trials(3).csv
 
 This file contains the **ground truth data** collected during the experiment.
 
@@ -31,7 +31,7 @@ The dataset includes manually recorded values such as:
 
 These measurements represent the **reference values** used to evaluate the accuracy of the iPhone recordings.
 
-### registered_data.csv
+### Data - cybercrime_data.csv
 
 This file contains the **data extracted from the Apple Health app on the iPhones used in the experiment**.
 
